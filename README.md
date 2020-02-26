@@ -115,7 +115,6 @@ Create two subdirectories, out and sides:
 
 ```
 mkdir /opt/plugins/custom/selenium/opsdis.com/{out,sides}
-
 ```
 
 Add the side-file to the sides subdirectory and modify the permissions:
