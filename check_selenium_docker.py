@@ -51,7 +51,7 @@ while not os.path.isfile(result) and waitedfor <= 300:
     waitedfor += 1
 
 # If no result was received after 5 minutes exit with status unknown
-if waitedfor == 300:
+if waitedfor >= 300:
     container.stop()
     print("UNKNOWN: Test timed out. Investigate issues.")
     sys.exit(3)
