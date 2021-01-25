@@ -22,9 +22,11 @@ import glob
 
 # Parse commandline arguments
 parser = argparse.ArgumentParser()
+parser.add_argument("--timeout", type=int, default=300, help="results waiting timeout in sec, default 300")
 parser.add_argument("path", type=str, help="path to selenium test")
 args = parser.parse_args()
 path = args.path
+timeout = abs(args.timeout)
 os.chdir(path)
 
 # Find side file and parse it to get the project name
@@ -46,12 +48,12 @@ container = client.containers.run("opsdis/selenium-chrome-node-with-side-runner"
 
 # Wait for result file to be written
 waitedfor = 0
-while not os.path.isfile(result) and waitedfor <= 300:
+while not os.path.isfile(result) and waitedfor <= timeout:
     time.sleep(1)
     waitedfor += 1
 
-# If no result was received after 5 minutes exit with status unknown
-if waitedfor >= 300:
+# If no result was received after timeout exit with status unknown
+if waitedfor >= timeout:
     container.stop()
     print("UNKNOWN: Test timed out. Investigate issues.")
     sys.exit(3)
@@ -65,7 +67,8 @@ file.close()
 container.stop()
 
 # Calculate execution time
-exec_time = int(str(json_input['testResults'][0]['endTime'])[:-3]) - int(str(json_input['startTime'])[:-3])
+exec_time = 0 if len(json_input['testResults']) == 0 else \
+    int(str(json_input['testResults'][0]['endTime'])[:-3]) - int(str(json_input['startTime'])[:-3])
 
 # Exit logic with performance data
 if json_input['numFailedTests'] == 0:
